@@ -148,7 +148,6 @@ class NET(nn.Module):
 
             offset1, offset2 = self.task_manager.get_label_offset(old_task_i-1)[1], self.task_manager.get_label_offset(old_task_i)[1]
             output, _ = self.net(subgraph, features_)
-            # old_task_loss = self.ce(output[self.memory_data[old_task_i], offset1: offset2], labels[self.memory_data[old_task_i]] - offset1 )
             output_labels_ = labels_[self.memory_data[old_task_i]]
 
             # balance the loss of data from different classes
