@@ -188,5 +188,4 @@ class NET(nn.Module):
                 project2cone2(self.grads[:, t].unsqueeze(1), self.grads.index_select(1, indx), self.margin)
                 # copy gradients back
                 overwrite_grad(self.net.parameters, self.grads[:, t], self.grad_dims)
-
         self.opt.step()
