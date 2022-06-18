@@ -268,6 +268,7 @@ def pipeline_task_IL_no_inter_edge_joint(args):
                                                                                              args.task_seq[t]), 'rb'))
             except:
                 subgraph, ids_per_cls, [train_ids, valid_idx, test_ids] = dataset.get_graph(tasks_to_retain=task_cls)
+                mkdir_if_missing('./data/no_inter_tsk_edge')
                 with open('./data/no_inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                                    task_cls),
                           'wb') as f:
@@ -350,6 +351,7 @@ def pipeline_task_IL_inter_edge_joint(args):
             subgraph, ids_per_cls_all, [train_ids, valid_idx, test_ids] = pickle.load(open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,args.task_seq[-1]), 'rb'))
         except:
             subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids] = dataset.get_graph(tasks_to_retain=cls_retain)
+            mkdir_if_missing('./data/inter_tsk_edge')
             with open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,args.task_seq[-1]),'wb') as f:
                 pickle.dump([subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids]], f)
         subgraph = subgraph.to(device='cuda:{}'.format(args.gpu))
@@ -441,6 +443,7 @@ def pipeline_class_IL_no_inter_edge(args):
                     pickle.dump([subgraph, ids_per_cls, [train_ids, valid_ids, test_ids]], f)
             else:
                 subgraph, ids_per_cls, [train_ids, valid_ids, test_ids] = dataset.get_graph(tasks_to_retain = task_cls)
+                mkdir_if_missing('./data/no_inter_tsk_edge')
                 with open('./data/no_inter_tsk_edge/{}_{}.pkl'.format(args.dataset, task_cls),
                           'wb') as f:
                     pickle.dump([subgraph, ids_per_cls, [train_ids, valid_ids, test_ids]], f)
@@ -523,6 +526,7 @@ def pipeline_class_IL_inter_edge(args):
         except:
             subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids] = dataset.get_graph(
                 tasks_to_retain=cls_retain)
+            mkdir_if_missing('./data/inter_tsk_edge')
             with open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,task_cls),'wb') as f:
                 pickle.dump([subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids]], f)
 
@@ -609,6 +613,7 @@ def pipeline_class_IL_no_inter_edge_joint(args):
                     './data/no_inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                              args.task_seq[t]), 'rb'))
             except:
+                mkdir_if_missing('./data/no_inter_tsk_edge')
                 subgraph, ids_per_cls, [train_ids, valid_idx, test_ids] = dataset.get_graph(tasks_to_retain=task_cls)
                 with open('./data/no_inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                                    task_cls),
@@ -691,6 +696,7 @@ def pipeline_class_IL_inter_edge_joint(args):
         try:
             subgraph, ids_per_cls_all, [train_ids, valid_idx, test_ids] = pickle.load(open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,args.task_seq[-1]), 'rb'))
         except:
+            mkdir_if_missing('./data/inter_tsk_edge')
             subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids] = dataset.get_graph(tasks_to_retain=cls_retain)
             with open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,args.task_seq[-1]),'wb') as f:
                 pickle.dump([subgraph, ids_per_cls_all, [train_ids, valid_ids, test_ids]], f)

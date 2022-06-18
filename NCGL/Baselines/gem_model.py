@@ -63,10 +63,10 @@ class NET(nn.Module):
         for old_task_i in self.observed_tasks[:-1]:
 
             if args.cross_task_edges:
-                subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open('/store/continual_graph_learning/CGLB/data/crs_tsk_edge/{}_{}.pkl'.format(args.dataset, args.task_seq[old_task_i]),'rb'))
+                subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open('./data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset, args.task_seq[old_task_i]),'rb'))
             else:
                 subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open(
-                    '/store/continual_graph_learning/CGLB/data/no_crs_tsk_edge/{}_{}.pkl'.format(args.dataset,
+                    './data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                               args.task_seq[old_task_i]), 'rb'))
 
             subgraph = subgraph.to(device='cuda:{}'.format(args.gpu))
@@ -131,14 +131,14 @@ class NET(nn.Module):
 
         # compute gradient on previous tasks
         for old_task_i in self.observed_tasks[:-1]:
-            if args.cross_task_edges:
+            if args.inter_task_edges:
                 subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open(
-                    '/store/continual_graph_learning/CGLB/data/crs_tsk_edge_corrected/{}_{}.pkl'.format(args.dataset,
+                    './data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                               args.task_seq[
                                                                                                   old_task_i]), 'rb'))
             else:
                 subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open(
-                    '/store/continual_graph_learning/CGLB/data/no_crs_tsk_edge/{}_{}.pkl'.format(args.dataset,
+                    './data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                                  args.task_seq[
                                                                                                      old_task_i]),'rb'))
             subgraph = subgraph.to(device='cuda:{}'.format(args.gpu))
