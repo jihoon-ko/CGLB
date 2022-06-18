@@ -144,7 +144,6 @@ class NET(nn.Module):
             subgraph = subgraph.to(device='cuda:{}'.format(args.gpu))
             features_, labels_ = subgraph.srcdata['feat'], subgraph.dstdata['label'].squeeze()
             self.net.zero_grad()
-            # fwd/bwd on the examples in the memory
 
             offset1, offset2 = self.task_manager.get_label_offset(old_task_i-1)[1], self.task_manager.get_label_offset(old_task_i)[1]
             output, _ = self.net(subgraph, features_)
