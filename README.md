@@ -2,7 +2,7 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
- <tr><td colspan="4"> <a href="#Get-Started">Get Started</a></td></tr> | <tr><td colspan="4"> <a href="#Dataset-Usages">Dataset Usages</a></td></tr> | <tr><td colspan="4"> <a href="#Pipeline-Usages">Pipeline Usages</a></td></tr> | <tr><td colspan="4"> <a href="#Evaluation">Evaluation & Visualization Toolkit</a></td></tr> | <tr><td colspan="4"> <a href="#Benchmarks"> Benchmarks </a></td></tr> | <tr><td colspan="4"> <a href="#Acknowledgement"> Acknowledgement </a></td></tr>
+ <tr><td colspan="4"> <a href="#Get-Started">Get Started</a></td></tr> | <tr><td colspan="4"> <a href="#Dataset-Usages">Dataset Usages</a></td></tr> | <tr><td colspan="4"> <a href="#Pipeline-Usages">Pipeline Usages</a></td></tr> | <tr><td colspan="4"> <a href="#Evaluation-and-Visualization-Toolkit">Evaluation & Visualization Toolkit</a></td></tr> | <tr><td colspan="4"> <a href="#Benchmarks"> Benchmarks </a></td></tr> | <tr><td colspan="4"> <a href="#Acknowledgement"> Acknowledgement </a></td></tr>
 
  ## Get Started
  
@@ -87,7 +87,7 @@
  ```
  
  
- ## Evaluation & Visualization Toolkit
+ ## Evaluation and Visualization Toolkit
  We provide three protocols to evaluate the obtained results as follows. With out pipeline, the results are uniformly stored in the form of performance matrix, which can be directly fed into our evaluation toolkit.
  
  ### 1. Visualization of the Performance Matrix
