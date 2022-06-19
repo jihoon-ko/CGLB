@@ -118,7 +118,7 @@ class NET(nn.Module):
         
         self.opt.step()
 
-    def observe_task_IL(self, args, dataloader, g, features, labels, t, train_ids, ids_per_cls, dataset):
+    def observe_task_IL(self, args, g, features, labels, t, train_ids, ids_per_cls, dataset):
         # update memory
         if t != self.current_task:
             self.observed_tasks.append(t)
