@@ -92,7 +92,7 @@
  
  ### 1. Visualization of the Performance Matrix
  
- This is the most thorough evaluation of a continual learning model since it shows the performance change of each task along the learning process on the entire task sequence. Suppose an experiment result is stored via the path ``` "result_path" ```, the generation of the visualization could be obtained by the following code. Note that the path should be quoted in ``` " " ``` instead of ``` ' ' ```, since ``` ' ' ``` may exist in the file name of the experimental result.
+ This is the most thorough evaluation of a continual learning model since it shows the performance change of each task along the learning process on the entire task sequence. Suppose an experiment result is stored via the path ``` "result_path" ```, the generation of the visualization could be obtained by the following code. Note that the path should be quoted in ``` " " ``` instead of ``` ' ' ```, since ``` ' ' ``` may exist in the file name of the experimental result. Some examples are provided in <tr><td colspan="4"> <a href="#N-CGL-under-Class-IL">N-CGL under Class-IL</a></td></tr>.
  ```
  from CGLB.NCGL.visualize import show_performance_matrices
  show_performance_matrices("result_path")
@@ -100,7 +100,7 @@
  
  ### 2. Learning Curve
  
- This shows the curve of the average performance (AP). It contains less information than the performance matrix but can demonstrate the learning dynamics in a more direct and compact way. Suppose an experiment result is stored via the path ```result_path```, the learning curve could be obtained by the following code.
+ This shows the curve of the average performance (AP). It contains less information than the performance matrix but can demonstrate the learning dynamics in a more direct and compact way. Suppose an experiment result is stored via the path ```result_path```, the learning curve could be obtained by the following code. Some examples are provided in <tr><td colspan="4"> <a href="#N-CGL-under-Class-IL">N-CGL under Class-IL</a></td></tr>.
  ```
  from CGLB.NCGL.visualize import show_learning_curve
  show_learning_curve("result_path")
