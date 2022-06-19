@@ -118,7 +118,7 @@ class NET(nn.Module):
         
         self.opt.step()
 
-    def observe_task_IL(self, args, g, features, labels, t, train_ids, ids_per_cls, dataset):
+    def observe_task_IL(self, args, dataloader, g, features, labels, t, train_ids, ids_per_cls, dataset):
         # update memory
         if t != self.current_task:
             self.observed_tasks.append(t)
@@ -138,7 +138,7 @@ class NET(nn.Module):
                                                                                                   old_task_i]), 'rb'))
             else:
                 subgraph, ids_per_cls, [train_ids_, valid_ids, test_ids] = pickle.load(open(
-                    './data/inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
+                    './data/no_inter_tsk_edge/{}_{}.pkl'.format(args.dataset,
                                                                                                  args.task_seq[
                                                                                                      old_task_i]),'rb'))
             subgraph = subgraph.to(device='cuda:{}'.format(args.gpu))
