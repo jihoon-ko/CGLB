@@ -118,12 +118,22 @@
  ## Benchmarks
  This section shows our currently obtained results from different baselines. This section will keeps being updated to show state-of-the-art results.
  ### N-CGL under Task-IL
+ The results on N-CGL under the task-IL setting without inter-task edges are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_taskIL_no_crsedge.png)
+ The results on N-CGL under the task-IL setting with inter-task edges are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_taskIL_crsedge.png) 
+
+### N-CGL under Class-IL
+ The results on N-CGL under the class-IL setting with inter-task edges are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_classIL_no_crsedge.png) 
+The learning dynamics under the class-IL setting is more meaningful in reflecting the forgetting behavior of the models, therefore, we also show the learning curves and the visualization of the performance matrices as a demonstration of our evaluation & visualization toolkit. The learning curve is obtained on all four datasets, and the performance matrices are visualized on the CoraFull-CL datasets with the largest number of tasks.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_classIL_no_crsedge_learning_curve.png) 
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_classIL_no_crsedge_performance_matrices_corafull.png) 
  
- ### N-CGL under Class-IL
- 
- ### G-CGL under Task-IL
- 
- ### G-CGL under Class-IL
+### G-CGL under Task-IL&Class-IL
+ The results on G-CGL under both task-IL and class-IL are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/gcgl.png) 
+
  
  ## Acknowledgement
  The construction of CGLB also benefits from existing repositories on both continual learning and continual graph learning. Specifically, the construction of the pipeline for training the continual learning models learns from both [GEM](https://github.com/facebookresearch/GradientEpisodicMemory) and [TWP](https://github.com/hhliu79/TWP). The implementations of the implementations of EWC, GEM learn from [GEM](https://github.com/facebookresearch/GradientEpisodicMemory). The implementations of MAS, Lwf, TWP learn from [MAS](https://github.com/rahafaljundi/MAS-Memory-Aware-Synapses) and [TWP](https://github.com/hhliu79/TWP). The implementation of TWP is adapted from [TWP](https://github.com/hhliu79/TWP). The construction of the datasets also benefits from several existing databases and libraries. The construction of the N-CGL datasets uses the datasets and tools from OGB and DGL. The construction of the G-CGL datasets uses the datasets and tools from [DGL](https://docs.dgl.ai/) and [DGL-Lifesci](https://lifesci.dgl.ai/api/data.html).
