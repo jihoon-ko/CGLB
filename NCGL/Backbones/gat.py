@@ -109,11 +109,11 @@ class GCN(nn.Module):
         e_list = []
         h = features
         for i,layer in enumerate(self.gat_layers[:-1]):
-            h, e = layer(blocks[i], h)
+            h, e = layer.forward_batch(blocks[i], h)
             h = F.relu(h)
             e_list = e_list + e
             h = F.dropout(h, p=self.dropout, training=self.training)
-        logits, e = self.gat_layers[-1](blocks[-1], h)
+        logits, e = self.gat_layers[-1].forward_batch(blocks[-1], h)
         self.second_last_h = logits if len(self.gat_layers) == 1 else h
         e_list = e_list + e
         return logits, e_list

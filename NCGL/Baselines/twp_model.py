@@ -128,13 +128,12 @@ class NET(torch.nn.Module):
         loss.backward(retain_graph=True)
         grad_norm = 0
 
-        # comment the following unfunctioning code to save memory
-        '''
+        # the following code is not functioning actually, performance does not change either with pg = p.grad.clone()
+
         for p in self.net.parameters():
             pg = p.grad.data.clone()
-            # pg = p.grad.clone()
             grad_norm += torch.norm(pg, p=1)
-        '''
+
 
         for tt in range(t):
             for i, p in enumerate(self.net.parameters()):
@@ -177,3 +176,178 @@ class NET(torch.nn.Module):
 
             self.current_task = t
 
+    def observe_task_IL_batch(self, args, g, dataloader, features, labels, t, train_ids, ids_per_cls, dataset):
+        ############### try to simulate the original setting of twp
+        self.epochs += 1
+        last_epoch = self.epochs % args.epochs
+        self.net.train()
+
+        # train the current task
+        self.net.zero_grad()
+        offset1, offset2 = self.task_manager.get_label_offset(t - 1)[1], self.task_manager.get_label_offset(t)[1]
+        for input_nodes, output_nodes, blocks in dataloader:
+            self.net.zero_grad()
+            blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
+            input_features = blocks[0].srcdata['feat']
+            output_labels = blocks[-1].dstdata['label'].squeeze()
+            if args.cls_balance:
+                n_per_cls = [(output_labels == j).sum() for j in range(args.n_cls)]
+                loss_w_ = [1. / max(i, 1) for i in n_per_cls]  # weight to balance the loss of different class
+            else:
+                loss_w_ = [1. for i in range(args.n_cls)]
+            loss_w_ = torch.tensor(loss_w_).to(device='cuda:{}'.format(args.gpu))
+            output_labels = output_labels - offset1
+            output_predictions, elist = self.net.forward_batch(blocks, input_features)
+            if args.classifier_increase:
+                loss = self.ce(output_predictions[:, offset1:offset2], output_labels, weight=loss_w_[offset1: offset2])
+            else:
+                loss = self.ce(output_predictions, output_labels, weight=self.aux_loss_w_)
+            loss.backward(retain_graph=True)
+            grad_norm = 0
+            for tt in range(t):
+                for i, p in enumerate(self.net.parameters()):
+                    l = self.lambda_l * self.fisher_loss[tt][i] + self.lambda_t * self.fisher_att[tt][i]
+                    l = l * (p - self.optpar[tt][i]).pow(2)
+                    loss += l.sum()
+            loss = loss + self.beta * grad_norm
+            loss.backward()
+            self.opt.step()
+
+        # store gradients for future tasks
+        if last_epoch == 0:
+            self.net.zero_grad()
+            self.fisher_loss[t] = []
+            self.fisher_att[t] = []
+            self.optpar[t] = []
+
+            pgss_floss,pgss_fatt = [], []
+            for input_nodes, output_nodes, blocks in dataloader:
+                pgs_floss,pgs_fatt = [], []
+                self.net.zero_grad()
+                blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
+                input_features = blocks[0].srcdata['feat']
+                output_labels = blocks[-1].dstdata['label'].squeeze()
+                if args.cls_balance:
+                    n_per_cls = [(output_labels == j).sum() for j in range(args.n_cls)]
+                    loss_w_ = [1. / max(i, 1) for i in n_per_cls]  # weight to balance the loss of different class
+                else:
+                    loss_w_ = [1. for i in range(args.n_cls)]
+                loss_w_ = torch.tensor(loss_w_).to(device='cuda:{}'.format(args.gpu))
+                output_labels = output_labels - offset1
+                output_predictions, elist = self.net.forward_batch(blocks, input_features)
+                if args.classifier_increase:
+                    loss = self.ce(output_predictions[:, offset1:offset2], output_labels,weight=loss_w_[offset1: offset2])
+                else:
+                    loss = self.ce(output_predictions, output_labels, weight=self.aux_loss_w_)
+                loss.backward(retain_graph=True)
+                for p in self.net.parameters():
+                    pg = p.grad.data.clone().pow(2)
+                    pgs_floss.append(pg)
+                pgss_floss.append(pgs_floss)
+                eloss = torch.norm(elist[0])
+                eloss.backward()
+                for p in self.net.parameters():
+                    pg = p.grad.data.clone().pow(2)
+                    pgs_fatt.append(pg)
+                pgss_fatt.append(pgs_floss)
+
+            for i,p in enumerate(self.net.parameters()):
+                pg_floss_,pgs_fatt_ = [],[]
+                for pgs_ in pgss_floss:
+                    pg_floss_.append(pgs_[i])
+                for pgs_ in pgss_fatt:
+                    pgs_fatt_.append(pgs_[i])
+                pd = p.data.clone()
+                #pg = p.grad.data.clone().pow(2)
+                self.optpar[t].append(pd)
+                self.fisher_loss[t].append(sum(pg_floss_)/len(pg_floss_))
+                self.fisher_att[t].append(sum(pgs_fatt_)/len(pgs_fatt_))
+
+            self.current_task = t
+
+    def observe_class_IL_batch(self, args, g, dataloader, features, labels, t, train_ids, ids_per_cls, dataset):
+        ############### try to simulate the original setting of twp
+        self.epochs += 1
+        last_epoch = self.epochs % args.epochs
+        self.net.train()
+
+        # train the current task
+        self.net.zero_grad()
+        offset1, offset2 = self.task_manager.get_label_offset(t)
+        for input_nodes, output_nodes, blocks in dataloader:
+            self.net.zero_grad()
+            blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
+            input_features = blocks[0].srcdata['feat']
+            output_labels = blocks[-1].dstdata['label'].squeeze()
+            if args.cls_balance:
+                n_per_cls = [(output_labels == j).sum() for j in range(args.n_cls)]
+                loss_w_ = [1. / max(i, 1) for i in n_per_cls]  # weight to balance the loss of different class
+            else:
+                loss_w_ = [1. for i in range(args.n_cls)]
+            loss_w_ = torch.tensor(loss_w_).to(device='cuda:{}'.format(args.gpu))
+            output_predictions, elist = self.net.forward_batch(blocks, input_features)
+            if args.classifier_increase:
+                loss = self.ce(output_predictions[:, offset1:offset2], output_labels, weight=loss_w_[offset1: offset2])
+            else:
+                loss = self.ce(output_predictions, output_labels, weight=self.aux_loss_w_)
+            loss.backward(retain_graph=True)
+            grad_norm = 0
+            for tt in range(t):
+                for i, p in enumerate(self.net.parameters()):
+                    l = self.lambda_l * self.fisher_loss[tt][i] + self.lambda_t * self.fisher_att[tt][i]
+                    l = l * (p - self.optpar[tt][i]).pow(2)
+                    loss += l.sum()
+            loss = loss + self.beta * grad_norm
+            loss.backward()
+            self.opt.step()
+
+        # store gradients for future tasks
+        if last_epoch == 0:
+            self.net.zero_grad()
+            self.fisher_loss[t] = []
+            self.fisher_att[t] = []
+            self.optpar[t] = []
+
+            pgss_floss,pgss_fatt = [], []
+            for input_nodes, output_nodes, blocks in dataloader:
+                pgs_floss,pgs_fatt = [], []
+                self.net.zero_grad()
+                blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
+                input_features = blocks[0].srcdata['feat']
+                output_labels = blocks[-1].dstdata['label'].squeeze()
+                if args.cls_balance:
+                    n_per_cls = [(output_labels == j).sum() for j in range(args.n_cls)]
+                    loss_w_ = [1. / max(i, 1) for i in n_per_cls]  # weight to balance the loss of different class
+                else:
+                    loss_w_ = [1. for i in range(args.n_cls)]
+                loss_w_ = torch.tensor(loss_w_).to(device='cuda:{}'.format(args.gpu))
+                output_predictions, elist = self.net.forward_batch(blocks, input_features)
+                if args.classifier_increase:
+                    loss = self.ce(output_predictions[:, offset1:offset2], output_labels,weight=loss_w_[offset1: offset2])
+                else:
+                    loss = self.ce(output_predictions, output_labels, weight=self.aux_loss_w_)
+                loss.backward(retain_graph=True)
+                for p in self.net.parameters():
+                    pg = p.grad.data.clone().pow(2)
+                    pgs_floss.append(pg)
+                pgss_floss.append(pgs_floss)
+                eloss = torch.norm(elist[0])
+                eloss.backward()
+                for p in self.net.parameters():
+                    pg = p.grad.data.clone().pow(2)
+                    pgs_fatt.append(pg)
+                pgss_fatt.append(pgs_floss)
+
+            for i,p in enumerate(self.net.parameters()):
+                pg_floss_,pgs_fatt_ = [],[]
+                for pgs_ in pgss_floss:
+                    pg_floss_.append(pgs_[i])
+                for pgs_ in pgss_fatt:
+                    pgs_fatt_.append(pgs_[i])
+                pd = p.data.clone()
+                #pg = p.grad.data.clone().pow(2)
+                self.optpar[t].append(pd)
+                self.fisher_loss[t].append(sum(pg_floss_)/len(pg_floss_))
+                self.fisher_att[t].append(sum(pgs_fatt_)/len(pgs_fatt_))
+
+            self.current_task = t

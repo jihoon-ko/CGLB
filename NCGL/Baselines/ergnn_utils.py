@@ -37,22 +37,38 @@ class CM_sampler(nn.Module):
         super().__init__()
         self.plus = plus
 
-    def forward(self, ids_per_cls_train, budget, feats, reps, d):
+    def forward(self, ids_per_cls_train, budget, feats, reps, d, using_half=True):
         if self.plus:
-            return self.sampling(ids_per_cls_train, budget, reps, d)
+            return self.sampling(ids_per_cls_train, budget, reps, d, using_half=using_half)
         else:
-            return self.sampling(ids_per_cls_train, budget, feats, d)
+            return self.sampling(ids_per_cls_train, budget, feats, d, using_half=using_half)
 
-    def sampling(self,ids_per_cls_train, budget, vecs, d):
+    def sampling(self,ids_per_cls_train, budget, vecs, d, using_half=True):
         #n#eeds a line ids_per_cls_train = [list(set(ids).intersection(set(train_ids))) for ids in ids_per_cls]
         budget_dist_compute = 1000
+        '''
+        if using_half:
+            vecs = vecs.half()
+        '''
         vecs = vecs.half()
         ids_selected = []
         for i,ids in enumerate(ids_per_cls_train):
             other_cls_ids = list(range(len(ids_per_cls_train)))
             other_cls_ids.pop(i)
             ids_selected0 = ids_per_cls_train[i] if len(ids_per_cls_train[i])<budget_dist_compute else random.choices(ids_per_cls_train[i], k=budget_dist_compute)
-            dist = [torch.cdist(vecs[ids_selected0], vecs[random.choices(ids_per_cls_train[j], k=min(budget_dist_compute,len(ids_per_cls_train[j])))]) for j in other_cls_ids]
+
+            dist = []
+            vecs_0 = vecs[ids_selected0]
+            for j in other_cls_ids:
+                chosen_ids = random.choices(ids_per_cls_train[j], k=min(budget_dist_compute,len(ids_per_cls_train[j])))
+                vecs_1 = vecs[chosen_ids]
+                if len(chosen_ids) < 26 or len(ids_selected0) < 26:
+                    # torch.cdist throws error for tensor smaller than 26
+                    dist.append(torch.cdist(vecs_0.float(), vecs_1.float()).half())
+                else:
+                    dist.append(torch.cdist(vecs_0,vecs_1))
+
+            #dist = [torch.cdist(vecs[ids_selected0], vecs[random.choices(ids_per_cls_train[j], k=min(budget_dist_compute,len(ids_per_cls_train[j])))]) for j in other_cls_ids]
             dist_ = torch.cat(dist,dim=-1) # include distance to all the other classes
             n_selected = (dist_<d).sum(dim=-1)
             rank = n_selected.sort()[1].tolist()

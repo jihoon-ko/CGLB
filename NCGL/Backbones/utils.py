@@ -59,15 +59,14 @@ def mean_AP(args,logits, labels, cls_balance=True, ids_per_cls=None):
 
         return med2.item()
 
-def evaluate_batch(model, g, features, labels, mask, label_offset1, label_offset2, cls_balance=True, ids_per_cls=None):
+def evaluate_batch(args,model, g, features, labels, mask, label_offset1, label_offset2, cls_balance=True, ids_per_cls=None):
     model.eval()
     with torch.no_grad():
-        sampler = dgl.dataloading.MultiLayerFullNeighborSampler(2)
-        dataloader = dgl.dataloading.NodeDataLoader(g, list(range(labels.shape[0])), sampler, batch_size=100, shuffle=False, drop_last=False)
-        output = torch.tensor([]).cuda(labels.get_device())
-        output_l = torch.tensor([]).cuda(labels.get_device())
+        dataloader = dgl.dataloading.NodeDataLoader(g.cpu(), list(range(labels.shape[0])), args.nb_sampler, batch_size=args.batch_size, shuffle=False, drop_last=False)
+        output = torch.tensor([]).cuda(args.gpu)
+        output_l = torch.tensor([]).cuda(args.gpu)
         for input_nodes, output_nodes, blocks in dataloader:
-            blocks = [b.to(torch.device('cuda')) for b in blocks]
+            blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
             input_features = blocks[0].srcdata['feat']
             output_labels = blocks[-1].dstdata['label'].squeeze()
             output_predictions, _ = model.forward_batch(blocks, input_features)
@@ -78,9 +77,9 @@ def evaluate_batch(model, g, features, labels, mask, label_offset1, label_offset
         #judget = (labels==output_l).sum()
         logits = output[:, label_offset1:label_offset2]
         if cls_balance:
-            return accuracy(logits, labels, cls_balance=cls_balance, ids_per_cls=ids_per_cls)
+            return accuracy(logits, labels.cuda(args.gpu), cls_balance=cls_balance, ids_per_cls=ids_per_cls)
         else:
-            return accuracy(logits[mask], labels[mask], cls_balance=cls_balance, ids_per_cls=ids_per_cls)
+            return accuracy(logits[mask], labels[mask].cuda(args.gpu), cls_balance=cls_balance, ids_per_cls=ids_per_cls)
 
 def evaluate(model, g, features, labels, mask, label_offset1, label_offset2, cls_balance=True, ids_per_cls=None, save_logits_name=None):
     model.eval()

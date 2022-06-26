@@ -249,7 +249,6 @@ def signed_constant(module):
     std = gain / math.sqrt(fan)
     module.weight.data = module.weight.data.sign() * std
 
-
 gcn_msg = fn.copy_src(src='h', out='m')
 gcn_reduce = fn.sum(msg='m', out='h')
 class GCNLayer(nn.Module):
@@ -273,6 +272,25 @@ class GCNLayer(nn.Module):
         e = self.leaky_relu(graph.edata.pop('e'))
 
         e_soft = edge_softmax(graph, e)
+        elist.append(e_soft)
+        return h, elist
+
+    def forward_batch(self, block, feat):
+        # Creating a local scope so that all the stored ndata and edata
+        # (such as the `'h'` ndata below) are automatically popped out
+        # when the scope exits.
+        elist = []
+        block = block.local_var().to('cuda:{}'.format(feat.get_device()))
+        feat_src, feat_dst = expand_as_pair(feat)
+        h = self.linear(feat_src)
+        block.srcdata['h'] = h
+        block.update_all(gcn_msg, gcn_reduce)
+        h = block.dstdata['h']
+
+        block.apply_edges(lambda edges: {'e': th.sum((th.mul(edges.src['h'], th.tanh(edges.dst['h']))), 1)})
+        e = self.leaky_relu(block.edata.pop('e'))
+
+        e_soft = edge_softmax(block, e)
         elist.append(e_soft)
         return h, elist
 

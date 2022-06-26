@@ -6,9 +6,8 @@ from distutils.util import strtobool
 from pipeline import *
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(description='CGLB')
-    parser.add_argument("--dataset", type=str, default='Arxiv-CL')
+    parser.add_argument("--dataset", type=str, default='CoraFull-CL', help='Products-CL, Reddit-CL, Arxiv-CL, CoraFull-CL')
     parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--seed", type=int, default=1, help="seed for exp")
@@ -27,20 +26,20 @@ if __name__ == '__main__':
     parser.add_argument('--patience', type=int, default=30, help='')
 
     # parameters for continual learning settings
-    parser.add_argument('--share-labels', type=bool, default=False,
+    parser.add_argument('--share-labels', type=strtobool, default=False,
                         help='task-IL specific, whether to share output label space for different tasks')
-    parser.add_argument('--inter-task-edges', type=strtobool, default=True,
+    parser.add_argument('--inter-task-edges', type=strtobool, default=False,
                         help='whether to keep the edges connecting nodes from different tasks')
-    parser.add_argument('--classifier-increase', default=True,
+    parser.add_argument('--classifier-increase', type=strtobool, default=True,
                         help='class-IL specific, whether to enlarge the label space with the coming of new classes, unrealistic to be set as False')
 
     # extra parameters
-    parser.add_argument('--refresh_data', default=False, help='whether to load existing splitting or regenerate')
+    parser.add_argument('--refresh_data', type=strtobool, default=False, help='whether to load existing splitting or regenerate')
     parser.add_argument('--d_dtat', default=None)
     parser.add_argument('--n_cls', default=None)
     parser.add_argument('--ratio_valid_test', default=[0.2, 0.2], help='ratio of nodes used for valid and test')
-    parser.add_argument('--transductive', default=True, help='using transductive or inductive')
-    parser.add_argument('--default_split', default=False, help='whether to  use the data split provided by the dataset')
+    parser.add_argument('--transductive', type=strtobool, default=True, help='using transductive or inductive')
+    parser.add_argument('--default_split', type=strtobool, default=False, help='whether to  use the data split provided by the dataset')
     parser.add_argument('--dim_ratio', default=[1.0, False],
                         help='portion of data dims selected, whether randomly selected')
     parser.add_argument('--task_seq', default=[])
@@ -60,11 +59,22 @@ if __name__ == '__main__':
     parser.add_argument('--gem_args', default={'memory_strength': 0.5, 'n_memories': 100})
     parser.add_argument('--bare_args', default={'Na': None})
     parser.add_argument('--joint_args', default={'Na': None})
-    parser.add_argument('--cls-balance', default=True, help='whether to balance the cls when training and testing')
-    parser.add_argument('--repeats', default=5)
-    parser.add_argument('--ILmode', default='taskIL',choices=['taskIL','classIL'])#, help='if set as True, run the class-IL setting, otherwise, run the task-IL setting')
+    parser.add_argument('--cls-balance', type=strtobool, default=True, help='whether to balance the cls when training and testing')
+    parser.add_argument('--repeats', type=int, default=1, help='how many times to repeat the experiments for the mean and std')
+    parser.add_argument('--ILmode', default='taskIL',choices=['taskIL','classIL'])
+    parser.add_argument('--batch_size', type=int, default=2000)
+    parser.add_argument('--minibatch', type=strtobool, default=False, help='whether to use the mini-batch training')
+    parser.add_argument('--batch_shuffle', type=strtobool, default=True, help='whether to shuffle the data when constructing the dataloader')
+    parser.add_argument('--sample_nbs', type=strtobool, default=False, help='whether to sample neighbors instead of using all')
+    parser.add_argument('--n_nbs_sample', type=lambda x: [int(i) for i in x.replace(' ', '').split(',')], default=[10, 25], help='number of neighbors to sample per hop, use comma to separate the numbers when using the command line, e.g. 10,25 or 10, 25')
+    parser.add_argument('--nb_sampler', default=None)
     args = parser.parse_args()
     set_seed(args)
+
+    if args.sample_nbs:
+        args.nb_sampler = dgl.dataloading.MultiLayerNeighborSampler(args.n_nbs_sample)
+    else:
+        args.nb_sampler = dgl.dataloading.MultiLayerFullNeighborSampler(2)
 
     main = get_pipeline(args)
 
@@ -87,6 +97,8 @@ if __name__ == '__main__':
             subfolder = 'no_inter_task_edges/tsk_IL/'
 
     name = f'{subfolder}{args.dataset}_{args.n_cls_per_task}_{args.method}_{list(method_args[args.method].values())}_{args.backbone}_{backbone_args[args.backbone]}_{args.classifier_increase}_{args.cls_balance}_{args.epochs}_{args.repeats}'
+    if args.minibatch:
+        name=name+f'_bs{args.batch_size}'
     mkdir_if_missing('./results/'+subfolder)
     if os.path.isfile(
             './results/{}.pkl'.format(

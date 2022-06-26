@@ -66,16 +66,32 @@
  ### N-CGL
  Below is the example to run the 'Bare model' baseline with GCN backbone on the Arxiv-CL dataset under the task-IL scenario. 
  
- For both N-CGL and G-CGL experiments, the starting point is the ```train.py``` file, and the different configurations are assigned through the keyword arguments of the Argparse module. For example, to run the N-CGL experiments without inter-task edge under the task-IL scenario, the following code is to be used.
+ For both N-CGL and G-CGL experiments, the starting point is the ```train.py``` file, and the different configurations (e.g. the baseline, backbone, learning scenario (task-IL or class-IL), whether to include inter task edges, etc.) are assigned through the keyword arguments of the Argparse module. For example, to run the N-CGL experiments without inter-task edge under the task-IL scenario, the following code is to be used.
  
  ```
- python train.py --dataset $Arxiv-CL \
-        --method $Bare \
-        --basemodel $GCN \
+ python train.py --dataset Arxiv-CL \
+        --method bare \
+        --backbone GCN \
         --gpu 0 \
-        --clsIL False
+        --ILmode taskIL \
+        --inter-task-edges False \
+        --minibatch False \
  ```
- By specifying the ```--clsIL``` to be ```False```, the experiments are configured under the task-IL scenario. 
+Since the graphs in N-CGL can be too large to be processed in one batch on most devices, the ```--minibatch``` argument could be specified to be ```True``` for training with the large graphs in mini-batches.
+```
+ python train.py --dataset Arxiv-CL \
+        --method bare \
+        --backbone GCN \
+        --gpu 0 \
+        --ILmode taskIL \
+        --inter-task-edges False \
+        --minibatch True \
+        --batch_size 2000 \
+        --sample_nbs True \
+        --n_nbs_sample 10,25
+ ```
+In the above example, besides specifying the ```--minibatch```, the size of each mini-batch is also specified through ```--batch_size```. Moreover, some graphs are extremely dense and will run out the memory even with mini-batch training, which could be addressed through the neighborhood sampling specified via ```--sample_nbs```. And the number of neighbors to sample for each hop is specified through ```--n_nbs_sample```.
+There are also other customizable arguments, the full list of which can be found in ```train.py```.
  ### G-CGL
  Below is an example for running the 'Bare model' baseline with GCN backbone on the SIDER-tIL dataset under the task-IL scenario. 
  ```
