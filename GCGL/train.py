@@ -43,7 +43,10 @@ if __name__ == '__main__':
     parser.add_argument('--n_cls_per_task', default=1)
     parser.add_argument('--num_epochs',type=int,default=2)
     parser.add_argument('--threshold_pubchem', default=20)
-    parser.add_argument('--repeats', default=1)
+    parser.add_argument('--frac_train', default=0.8)
+    parser.add_argument('--frac_val', default=0.1)
+    parser.add_argument('--frac_test', default=0.1)
+    parser.add_argument('--repeats', default=5)
 
     args = parser.parse_args().__dict__
     args['exp'] = 'config'
@@ -62,12 +65,12 @@ if __name__ == '__main__':
         if args['clsIL']:
             if args['method'] == 'jointtrain':
                 args['method'] = 'jointreplay'
-            subfolder = 'clsIL/'
+            subfolder = f"clsIL/{args['frac_train']}/"
         else:
-            subfolder = 'tskIL/'
+            subfolder = f'tskIL/{args["frac_train"]}/'
     else:
         args['n_cls_per_task'] =1
-        subfolder = 'tskIL/'
+        subfolder = f'tskIL/{args["frac_train"]}/'
 
     name = '{}{}_{}_{}_{}_{}_{}_{}_{}'.format(subfolder, args['dataset'], args['n_cls_per_task'], args['method'],
                                               method_args[args['method']],

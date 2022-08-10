@@ -7,7 +7,7 @@ from pipeline import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CGLB')
-    parser.add_argument("--dataset", type=str, default='CoraFull-CL', help='Products-CL, Reddit-CL, Arxiv-CL, CoraFull-CL')
+    parser.add_argument("--dataset", type=str, default='Products-CL', help='Products-CL, Reddit-CL, Arxiv-CL, CoraFull-CL')
     parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--seed", type=int, default=1, help="seed for exp")
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('--refresh_data', type=strtobool, default=False, help='whether to load existing splitting or regenerate')
     parser.add_argument('--d_dtat', default=None)
     parser.add_argument('--n_cls', default=None)
-    parser.add_argument('--ratio_valid_test', default=[0.2, 0.2], help='ratio of nodes used for valid and test')
+    parser.add_argument('--ratio_valid_test', nargs='+', default=[0.4, 0.4], help='ratio of nodes used for valid and test')
     parser.add_argument('--transductive', type=strtobool, default=True, help='using transductive or inductive')
     parser.add_argument('--default_split', type=strtobool, default=False, help='whether to  use the data split provided by the dataset')
     parser.add_argument('--dim_ratio', default=[1.0, False],
@@ -69,6 +69,8 @@ if __name__ == '__main__':
     parser.add_argument('--n_nbs_sample', type=lambda x: [int(i) for i in x.replace(' ', '').split(',')], default=[10, 25], help='number of neighbors to sample per hop, use comma to separate the numbers when using the command line, e.g. 10,25 or 10, 25')
     parser.add_argument('--nb_sampler', default=None)
     args = parser.parse_args()
+    a = [float(i) for i in args.ratio_valid_test]
+    args.ratio_valid_test = a
     set_seed(args)
 
     if args.sample_nbs:
@@ -85,16 +87,17 @@ if __name__ == '__main__':
     # printing AM of different sampling under different buffer ratios
     acc_matrices = []
 
+    train_ratio = round(1-args.ratio_valid_test[0]-args.ratio_valid_test[1],2)
     if args.ILmode == 'classIL':
         if args.inter_task_edges:
-            subfolder = 'inter_task_edges/cls_IL/'
+            subfolder = f'inter_task_edges/cls_IL/train_ratio_{train_ratio}/'
         else:
-            subfolder = 'no_inter_task_edges/cls_IL/'
+            subfolder = f'no_inter_task_edges/cls_IL/train_ratio_{train_ratio}/'
     elif args.ILmode == 'taskIL':
         if args.inter_task_edges:
-            subfolder = 'inter_task_edges/tsk_IL/'
+            subfolder = f'inter_task_edges/tsk_IL/train_ratio_{train_ratio}/'
         else:
-            subfolder = 'no_inter_task_edges/tsk_IL/'
+            subfolder = f'no_inter_task_edges/tsk_IL/train_ratio_{train_ratio}/'
 
     name = f'{subfolder}{args.dataset}_{args.n_cls_per_task}_{args.method}_{list(method_args[args.method].values())}_{args.backbone}_{backbone_args[args.backbone]}_{args.classifier_increase}_{args.cls_balance}_{args.epochs}_{args.repeats}'
     if args.minibatch:

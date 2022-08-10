@@ -170,7 +170,7 @@ def train_valid_test_split(ids,ratio_valid_test):
 
 
 class NodeLevelDataset(incremental_graph_trans_):
-    def __init__(self,name='ogbn-arxiv',IL='class',default_split=False,ratio_valid_test=[0.2,0.2]):
+    def __init__(self,name='ogbn-arxiv',IL='class',default_split=False,ratio_valid_test=None):
         r""""
         name: name of the dataset
         IL: use task- or class-incremental setting
@@ -192,8 +192,10 @@ class NodeLevelDataset(incremental_graph_trans_):
             data = DglNodePropPredDataset('ogbn-arxiv', root='/store/data/ogb_downloaded')
             graph, label = data[0]
         elif name == 'Products-CL':
-            data = DglNodePropPredDataset('ogbn-arxiv', root='/store/data/ogb_downloaded')
+            data = DglNodePropPredDataset('ogbn-products', root='/store/data/ogb_downloaded')
             graph, label = data[0]
+        else:
+            print('invalid data name')
         n_cls = data.num_classes
         cls = [i for i in range(n_cls)]
         cls_id_map = {i: list((label.squeeze() == i).nonzero().squeeze().view(-1, ).numpy()) for i in cls}
@@ -212,16 +214,18 @@ class NodeLevelDataset(incremental_graph_trans_):
                                   list(set(cls_id_map[c]).intersection(set(test_idx)))] for c in cls}
 
         elif not default_split:
+            split_name = f'./tr{round(1-ratio_valid_test[0]-ratio_valid_test[1],2)}_va{ratio_valid_test[0]}_te{ratio_valid_test[1]}_split_{name}.pkl'
             try:
-                tr_va_te_split = pickle.load(open('./tr_va_te_split_{}.pkl'.format(name), 'rb')) # could use same split across different experiments for consistency
+                tr_va_te_split = pickle.load(open(split_name, 'rb')) # could use same split across different experiments for consistency
             except:
                 if ratio_valid_test[1] > 0:
                     tr_va_te_split = {c: train_valid_test_split(cls_id_map[c], ratio_valid_test=ratio_valid_test)
                                       for c in
-                                      cls}  # support and query splitting of each cls
+                                      cls}
+                    print(f'splitting is {ratio_valid_test}')
                 elif ratio_valid_test[1] == 0:
                     tr_va_te_split = {c: [cls_id_map[c], [], []] for c in
-                                      cls}  # support and query splitting of each cls
-                with open('./tr_va_te_split_{}.pkl'.format(name), 'wb') as f:
+                                      cls}
+                with open(split_name, 'wb') as f:
                     pickle.dump(tr_va_te_split, f)
         super().__init__([[graph, label], tr_va_te_split], n_cls)

@@ -73,7 +73,7 @@ class NET(torch.nn.Module):
         offset1, offset2 = self.task_manager.get_label_offset(t - 1)[1], self.task_manager.get_label_offset(t)[1]
         for input_nodes, output_nodes, blocks in dataloader:
             self.net.zero_grad()
-            blocks = [b.to(torch.device('cuda')) for b in blocks]
+            blocks = [b.to(device='cuda:{}'.format(args.gpu)) for b in blocks]
             input_features = blocks[0].srcdata['feat']
             output_labels = blocks[-1].dstdata['label'].squeeze()
 

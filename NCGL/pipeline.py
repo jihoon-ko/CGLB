@@ -60,7 +60,7 @@ def get_pipeline(args):
 
 def data_prepare(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -114,7 +114,7 @@ def data_prepare(args):
 
 def pipeline_task_IL_no_inter_edge(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -184,7 +184,7 @@ def pipeline_task_IL_no_inter_edge(args):
 
 def pipeline_task_IL_inter_edge(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -280,7 +280,7 @@ def pipeline_task_IL_inter_edge(args):
 def pipeline_task_IL_no_inter_edge_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -363,7 +363,7 @@ def pipeline_task_IL_no_inter_edge_joint(args):
 def pipeline_task_IL_inter_edge_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -448,7 +448,7 @@ def pipeline_task_IL_inter_edge_joint(args):
 
 def pipeline_class_IL_no_inter_edge(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -527,7 +527,7 @@ def pipeline_class_IL_no_inter_edge(args):
 
 def pipeline_class_IL_inter_edge(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -624,7 +624,7 @@ def pipeline_class_IL_inter_edge(args):
 def pipeline_class_IL_no_inter_edge_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -709,7 +709,7 @@ def pipeline_class_IL_no_inter_edge_joint(args):
 def pipeline_class_IL_inter_edge_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -786,7 +786,7 @@ def pipeline_class_IL_inter_edge_joint(args):
 
 def pipeline_task_IL_no_inter_edge_minibatch(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -880,7 +880,7 @@ def pipeline_task_IL_no_inter_edge_minibatch(args):
 def pipeline_task_IL_no_inter_edge_minibatch_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -977,7 +977,7 @@ def pipeline_task_IL_no_inter_edge_minibatch_joint(args):
 
 def pipeline_class_IL_no_inter_edge_minibatch(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -1063,7 +1063,7 @@ def pipeline_class_IL_no_inter_edge_minibatch(args):
 
 def pipeline_task_IL_inter_edge_minibatch(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -1162,7 +1162,7 @@ def pipeline_task_IL_inter_edge_minibatch(args):
 def pipeline_task_IL_inter_edge_minibatch_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -1243,7 +1243,7 @@ def pipeline_task_IL_inter_edge_minibatch_joint(args):
 
 def pipeline_class_IL_inter_edge_minibatch(args):
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls
@@ -1342,7 +1342,7 @@ def pipeline_class_IL_inter_edge_minibatch(args):
 def pipeline_class_IL_inter_edge_minibatch_joint(args):
     args.method = 'joint_replay_all'
     torch.cuda.set_device(args.gpu)
-    dataset = NodeLevelDataset(args.dataset)
+    dataset = NodeLevelDataset(args.dataset,ratio_valid_test=args.ratio_valid_test)
     args.d_data, args.n_cls = dataset.d_data, dataset.n_cls
     cls = [list(range(i, i + args.n_cls_per_task)) for i in range(0, args.n_cls-1, args.n_cls_per_task)]
     args.task_seq = cls

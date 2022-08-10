@@ -92,7 +92,13 @@ Since the graphs in N-CGL can be too large to be processed in one batch on most 
  ```
 In the above example, besides specifying the ```--minibatch```, the size of each mini-batch is also specified through ```--batch_size```. Moreover, some graphs are extremely dense and will run out the memory even with mini-batch training, which could be addressed through the neighborhood sampling specified via ```--sample_nbs```. And the number of neighbors to sample for each hop is specified through ```--n_nbs_sample```.
 There are also other customizable arguments, the full list of which can be found in ```train.py```.
- ### G-CGL
+
+### Implementing New Methods 
+
+New continual graph learning methods can also be easily implemented in our highly modularized pipelines. 
+The newly implemented method should be contained in a python script file under the directory ```CGLB/NCGL/Baselines```. Suppose we are implementing a method named A, then an ```CGLB/NCGL/Baselines/A_model.py``` containing the implementation of the method should be created. The implementation is flexible as long as it satisfies the input format. Specifically, the python class of the new method should contain an *observe()* function for model training on a single task, whose input include the task configurations and the data. Details on the input format could be found in any ```xxx_model.py``` file under the directory ```CGLB/NCGL/Baselines```.
+
+### G-CGL
  Below is an example for running the 'Bare model' baseline with GCN backbone on the SIDER-tIL dataset under the task-IL scenario. 
  ```
  python train.py --dataset $SIDER-tIL \
