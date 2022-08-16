@@ -6,7 +6,7 @@
 
  ## Get Started
  
- This repository contains our CGLB implemented for running on GPU devices. To running in Windows system, please specify the argument ```--replace_illegal_char``` as ```True``` to avoid illegal filename characters (details are in <a href="#Pipeline-Usages">Pipeline Usages</a>). We also implmented a CPU version via [https://github.com/QueuQ/CGLBwin](https://github.com/QueuQ/CGLBcpu). To run the code, the following packages are required to be installed:
+ This repository contains our CGLB implemented for running on GPU devices. To running in Windows system, please specify the argument ```--replace_illegal_char``` as ```True``` to avoid illegal filename characters (details are in <a href="#Pipeline-Usages">Pipeline Usages</a>). We also implmented a CPU version via [https://github.com/QueuQ/CGLBcpu](https://github.com/QueuQ/CGLBcpu). To run the code, the following packages are required to be installed:
  
 * python==3.7.10
 * scipy==1.5.2
