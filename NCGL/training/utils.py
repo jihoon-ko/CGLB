@@ -28,3 +28,10 @@ def set_seed(args=None):
 
     dgl.random.seed(seed)
 
+def remove_illegal_characters(name, replacement='_'):
+    # replace any potential illegal characters with 'replacement'
+    for c in ['-', '[' ,']' ,'{', '}', "'", ',', ':', ' ']:
+        name = name.replace(c,replacement)
+    return name
+
+

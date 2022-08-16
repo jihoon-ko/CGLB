@@ -6,7 +6,7 @@
 
  ## Get Started
  
- CGLB needs the following packages to be installed:
+ CGLB is implemented in Linux and needs the following packages to be installed:
  
 * python==3.7.10
 * scipy==1.5.2
@@ -107,7 +107,23 @@ The newly implemented method should be contained in a python script file under t
         --gpu 0 \
         --clsIL False
  ```
- 
+
+### Running the Code in Other Systems
+
+Our code was implemented in Linux (specifically， Ubuntu 18), and we highly recommend running the code in Linux to avoid potential pitfalls. But we will also try our best to facilitate its implementation in other systems, and will list the reported problems encountered in other systems and the solutions (as shown below).
+
+1. OSError: [Errno 22] Invalid argument. If this error is triggered by the invalid filename when writing the experimental results, it may be caused by the illegal filename characters and can be avoided by specifying the argument ```--replace_illegal_char``` as ```True``` to replace the potential illegal characters with the underscore symbol ```_```. For example,
+ ```
+ python train.py --dataset Arxiv-CL \
+        --method bare \
+        --backbone GCN \
+        --gpu 0 \
+        --ILmode taskIL \
+        --inter-task-edges False \
+        --minibatch False \
+        --replace_illegal_char True 
+ ```
+
  
  ## Evaluation and Visualization Toolkit
  We provide three protocols to evaluate the obtained results as follows. With out pipeline, the results are uniformly stored in the form of performance matrix, which can be directly fed into our evaluation toolkit.

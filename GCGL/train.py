@@ -13,7 +13,7 @@ if __name__ == '__main__':
                         help='Model to use')
     parser.add_argument('--method', type=str, choices=['bare', 'lwf', 'gem', 'ewc', 'mas', 'twp', 'jointtrain', 'jointreplay'],
                         default='bare', help='Method to use')
-    parser.add_argument('-d', '--dataset', type=str, choices=['SIDER-tIL','Tox21-tIL','Aromaticity-CL'], default='Aromaticity-CL',
+    parser.add_argument('-d', '--dataset', type=str, choices=['SIDER-tIL','Tox21-tIL','Aromaticity-CL'], default='SIDER-tIL',
                         help='Dataset to use')
     parser.add_argument('-p', '--pre-trained', action='store_true',
                         help='Whether to skip training and use a pre-trained model')
@@ -39,14 +39,15 @@ if __name__ == '__main__':
                         help="seed for exp")
     parser.add_argument('--alpha_dis', type=float, default=0.1)
     parser.add_argument('--classifier_increase',default=False)
-    parser.add_argument('--clsIL', type=strtobool, default=True)
+    parser.add_argument('--clsIL', type=strtobool, default=False)
     parser.add_argument('--n_cls_per_task', default=1)
     parser.add_argument('--num_epochs',type=int,default=2)
     parser.add_argument('--threshold_pubchem', default=20)
     parser.add_argument('--frac_train', default=0.8)
     parser.add_argument('--frac_val', default=0.1)
     parser.add_argument('--frac_test', default=0.1)
-    parser.add_argument('--repeats', default=5)
+    parser.add_argument('--repeats', default=1)
+    parser.add_argument('--replace_illegal_char', type=strtobool, default=True)
 
     args = parser.parse_args().__dict__
     args['exp'] = 'config'
@@ -78,6 +79,8 @@ if __name__ == '__main__':
                                               args['gcn_hidden_feats'],
                                               args['classifier_increase'], args['repeats'])
     mkdir_if_missing('./results/' + subfolder)
+    if args['replace_illegal_char']:
+        name = remove_illegal_characters(name)
     if os.path.isfile('./results/{}.pkl'.format(name)):
         print('the following configuration exists \n','./results/{}.pkl'.format(name))
     else:

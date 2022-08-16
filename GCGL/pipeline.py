@@ -9,6 +9,13 @@ import copy
 from utils import collate_molgraphs, load_model, load_twpmodel, GraphLevelDataset
 import os
 import errno
+
+def remove_illegal_characters(name, replacement='_'):
+    # replace any potential illegal characters with 'replacement'
+    for c in ['-', '[' ,']' ,'{', '}', "'", ',', ':', ' ']:
+        name = name.replace(c,replacement)
+    return name
+
 def mkdir_if_missing(directory):
     if not os.path.exists(directory):
         try:

@@ -1,13 +1,13 @@
 import os
 import traceback
 import argparse
-from training.utils import set_seed, mkdir_if_missing
+from training.utils import set_seed, mkdir_if_missing, remove_illegal_characters
 from distutils.util import strtobool
 from pipeline import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CGLB')
-    parser.add_argument("--dataset", type=str, default='Products-CL', help='Products-CL, Reddit-CL, Arxiv-CL, CoraFull-CL')
+    parser.add_argument("--dataset", type=str, default='Arxiv-CL', help='Products-CL, Reddit-CL, Arxiv-CL, CoraFull-CL')
     parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--seed", type=int, default=1, help="seed for exp")
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('--sample_nbs', type=strtobool, default=False, help='whether to sample neighbors instead of using all')
     parser.add_argument('--n_nbs_sample', type=lambda x: [int(i) for i in x.replace(' ', '').split(',')], default=[10, 25], help='number of neighbors to sample per hop, use comma to separate the numbers when using the command line, e.g. 10,25 or 10, 25')
     parser.add_argument('--nb_sampler', default=None)
+    parser.add_argument('--replace_illegal_char', type=strtobool, default=True)
     args = parser.parse_args()
     a = [float(i) for i in args.ratio_valid_test]
     args.ratio_valid_test = a
@@ -103,6 +104,8 @@ if __name__ == '__main__':
     if args.minibatch:
         name=name+f'_bs{args.batch_size}'
     mkdir_if_missing('./results/'+subfolder)
+    if args.replace_illegal_char:
+        name = remove_illegal_characters(name)
     if os.path.isfile(
             './results/{}.pkl'.format(
                 name)):
