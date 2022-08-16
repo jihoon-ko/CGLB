@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--pre-trained', action='store_true',
                         help='Whether to skip training and use a pre-trained model')
     parser.add_argument('-g', '--gpu', type=int, default=1,
-                        help="which GPU to use. Set -1 to use CPU.")
+                        help="which GPU to use.")
 
     # ewc/mas/gem
     parser.add_argument('-me', '--memory-strength', type=float, default=10000,
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--frac_val', default=0.1)
     parser.add_argument('--frac_test', default=0.1)
     parser.add_argument('--repeats', default=1)
-    parser.add_argument('--replace_illegal_char', type=strtobool, default=True)
+    parser.add_argument('--replace_illegal_char', type=strtobool, default=False)
 
     args = parser.parse_args().__dict__
     args['exp'] = 'config'

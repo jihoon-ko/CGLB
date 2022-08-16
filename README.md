@@ -6,7 +6,7 @@
 
  ## Get Started
  
- CGLB is implemented in Linux and needs the following packages to be installed:
+ Our CGLB currently supports Linux systems with GPU devices. We also implmented a CPU version for Windows system via the [https://github.com/QueuQ/CGLBwin](https://github.com/QueuQ/CGLBwin). To run the code, the following packages are required to be installed:
  
 * python==3.7.10
 * scipy==1.5.2
@@ -18,6 +18,10 @@
 * ogb==1.3.1
 * dgl==0.6.1
 * dgllife==0.2.6
+
+For GCGL tasks, the following packages are also required:
+
+* rdkit==2020.09.1.0
  
  ## Dataset Usages
  
