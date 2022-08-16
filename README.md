@@ -97,6 +97,19 @@ Since the graphs in N-CGL can be too large to be processed in one batch on most 
 In the above example, besides specifying the ```--minibatch```, the size of each mini-batch is also specified through ```--batch_size```. Moreover, some graphs are extremely dense and will run out the memory even with mini-batch training, which could be addressed through the neighborhood sampling specified via ```--sample_nbs```. And the number of neighbors to sample for each hop is specified through ```--n_nbs_sample```.
 There are also other customizable arguments, the full list of which can be found in ```train.py```.
 
+When running the code in Windows system, the following error **OSError: [Errno 22] Invalid argument** may be triggered and could be avoided by specifying the argument ```--replace_illegal_char``` as ```True``` to replace the potential illegal characters with the underscore symbol ```_```. For example,
+ ```
+ python train.py --dataset Arxiv-CL \
+        --method bare \
+        --backbone GCN \
+        --gpu 0 \
+        --ILmode taskIL \
+        --inter-task-edges False \
+        --minibatch False \
+        --replace_illegal_char True 
+ ```
+
+
 ### Implementing New Methods 
 
 New continual graph learning methods can also be easily implemented in our highly modularized pipelines. 
@@ -110,20 +123,6 @@ The newly implemented method should be contained in a python script file under t
         --basemodel $GCN \
         --gpu 0 \
         --clsIL False
- ```
-
-### Running the Code in Windows System
-
-When running the code in Windows system, the following error **OSError: [Errno 22] Invalid argument** may be triggered and could be avoided by specifying the argument ```--replace_illegal_char``` as ```True``` to replace the potential illegal characters with the underscore symbol ```_```. For example,
- ```
- python train.py --dataset Arxiv-CL \
-        --method bare \
-        --backbone GCN \
-        --gpu 0 \
-        --ILmode taskIL \
-        --inter-task-edges False \
-        --minibatch False \
-        --replace_illegal_char True 
  ```
 
  
