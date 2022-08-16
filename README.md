@@ -6,7 +6,7 @@
 
  ## Get Started
  
- Our CGLB currently supports Linux systems with GPU devices. We also implmented a CPU version for Windows system via the [https://github.com/QueuQ/CGLBwin](https://github.com/QueuQ/CGLBwin). To run the code, the following packages are required to be installed:
+ This repository contains our CGLB implemented for running on GPU devices. To running in Windows system, please specify the argument ```--replace_illegal_char``` as ```True``` to avoid illegal filename characters (details are in <a href="#Running the Code in Windows System">Running the Code in Windows System</a>). We also implmented a CPU version via [https://github.com/QueuQ/CGLBwin](https://github.com/QueuQ/CGLBwin). To run the code, the following packages are required to be installed:
  
 * python==3.7.10
 * scipy==1.5.2
@@ -112,11 +112,9 @@ The newly implemented method should be contained in a python script file under t
         --clsIL False
  ```
 
-### Running the Code in Other Systems
+### Running the Code in Windows System
 
-Our code was implemented in Linux (specifically， Ubuntu 18), and we highly recommend running the code in Linux to avoid potential pitfalls. But we will also try our best to facilitate its implementation in other systems, and will list the reported problems encountered in other systems and the solutions (as shown below).
-
-1. OSError: [Errno 22] Invalid argument. If this error is triggered by the invalid filename when writing the experimental results, it may be caused by the illegal filename characters and can be avoided by specifying the argument ```--replace_illegal_char``` as ```True``` to replace the potential illegal characters with the underscore symbol ```_```. For example,
+When running the code in Windows system, the following error **OSError: [Errno 22] Invalid argument** may be triggered and could be avoided by specifying the argument ```--replace_illegal_char``` as ```True``` to replace the potential illegal characters with the underscore symbol ```_```. For example,
  ```
  python train.py --dataset Arxiv-CL \
         --method bare \
