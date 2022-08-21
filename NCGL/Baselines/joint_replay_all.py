@@ -4,6 +4,16 @@ from .ergnn_utils import *
 
 samplers = {'CM': CM_sampler(plus=False), 'CM_plus':CM_sampler(plus=True), 'MF':MF_sampler(plus=False), 'MF_plus':MF_sampler(plus=True)}
 class NET(torch.nn.Module):
+    """
+        Jointly trained model baseline for NCGL tasks
+
+        In this baseline, when ever a new task comes, the model will be jointly trained on all existing tasks.
+
+        :param model: The backbone GNNs, e.g. GCN, GAT, GIN, etc.
+        :param task_manager: Mainly serves to store the indices of the output dimensions corresponding to each task
+        :param args: The arguments containing the configurations of the experiments including the training parameters like the learning rate, the setting confugurations like class-IL and task-IL, etc. These arguments are initialized in the train.py file and can be specified by the users upon running the code.
+
+        """
     def __init__(self,
                  model,
                  task_manager,
@@ -37,6 +47,19 @@ class NET(torch.nn.Module):
 
 
     def observe(self, args, gs, featuress, labelss, t, train_idss, ids_per_clss, dataset):
+        """
+                The method for learning the given tasks under the class-IL setting.
+
+                :param args: Same as the args in __init__().
+                :param gs: The graphs of all the existing tasks to be jointly trained on.
+                :param featuress: Node features of the nodes in all the existing tasks.
+                :param labelss: Labels of the nodes in all the existing tasks.
+                :param t: Index of the newest task.
+                :param train_idss: The indices of the nodes participating in the training in all the existing tasks.
+                :param ids_per_clss: Indices of the nodes in each class of all the existing tasks.
+                :param dataset: The entire dataset (not in use in the current baseline).
+
+                """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t
@@ -62,6 +85,19 @@ class NET(torch.nn.Module):
         self.opt.step()
 
     def observe_task_IL(self, args, gs, featuress, labelss, t, train_idss, ids_per_clss, dataset):
+        """
+                The method for learning the given tasks under the task-IL setting.
+
+                :param args: Same as the args in __init__().
+                :param gs: The graphs of all the existing tasks to be jointly trained on.
+                :param featuress: Node features of the nodes in all the existing tasks.
+                :param labelss: Labels of the nodes in all the existing tasks.
+                :param t: Index of the newest task.
+                :param train_idss: The indices of the nodes participating in the training in all the existing tasks.
+                :param ids_per_clss: Indices of the nodes in each class of all the existing tasks.
+                :param dataset: The entire dataset (not in use in the current baseline).
+
+                """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t
@@ -85,6 +121,20 @@ class NET(torch.nn.Module):
         self.opt.step()
 
     def observe_task_IL_batch(self, args, gs, dataloader, featuress, labelss, t, train_idss, ids_per_clss, dataset):
+        """
+                        The method for learning the given tasks under the task-IL setting with mini-batch training.
+
+                        :param args: Same as the args in __init__().
+                        :param gs: The graphs of all the existing tasks to be jointly trained on.
+                        :param dataloader: The data loader for mini-batch training
+                        :param featuress: Node features of the nodes in all the existing tasks.
+                        :param labelss: Labels of the nodes in all the existing tasks.
+                        :param t: Index of the newest task.
+                        :param train_idss: The indices of the nodes participating in the training in all the existing tasks.
+                        :param ids_per_clss: Indices of the nodes in each class of all the existing tasks.
+                        :param dataset: The entire dataset (not in use in the current baseline).
+
+                        """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t
@@ -107,6 +157,20 @@ class NET(torch.nn.Module):
             self.opt.step()
 
     def observe_class_IL_batch(self, args, gs, dataloader, featuress, labelss, t, train_idss, ids_per_clss, dataset):
+        """
+                                The method for learning the given tasks under the class-IL setting with mini-batch training.
+
+                                :param args: Same as the args in __init__().
+                                :param gs: The graphs of all the existing tasks to be jointly trained on.
+                                :param dataloader: The data loader for mini-batch training
+                                :param featuress: Node features of the nodes in all the existing tasks.
+                                :param labelss: Labels of the nodes in all the existing tasks.
+                                :param t: Index of the newest task.
+                                :param train_idss: The indices of the nodes participating in the training in all the existing tasks.
+                                :param ids_per_clss: Indices of the nodes in each class of all the existing tasks.
+                                :param dataset: The entire dataset.
+
+                                """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t
@@ -129,6 +193,19 @@ class NET(torch.nn.Module):
             self.opt.step()
 
     def observe_task_IL_crsedge(self, args, g, features, labels_all, t, train_ids, ids_per_cls_all, dataset):
+        """
+                        The method for learning the given tasks under the task-IL setting with inter-task edges.
+
+                        :param args: Same as the args in __init__().
+                        :param g: The graphs of all the existing tasks to be jointly trained on.
+                        :param features: Node features of the nodes in all the existing tasks.
+                        :param labels_all: Labels of the nodes in all the existing tasks.
+                        :param t: Index of the newest task.
+                        :param train_ids: The indices of the nodes participating in the training in all the existing tasks.
+                        :param ids_per_cls_all: Indices of the nodes in each class of all the existing tasks.
+                        :param dataset: The entire dataset (not in use in the current baseline).
+
+                        """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t
@@ -160,6 +237,19 @@ class NET(torch.nn.Module):
         self.opt.step()
 
     def observe_class_IL_crsedge(self, args, g, features, labels_all, t, train_ids, ids_per_cls_all, dataset):
+        """
+                                The method for learning the given tasks under the class-IL setting with inter-task edges.
+
+                                :param args: Same as the args in __init__().
+                                :param g: The graphs of all the existing tasks to be jointly trained on.
+                                :param features: Node features of the nodes in all the existing tasks.
+                                :param labels_all: Labels of the nodes in all the existing tasks.
+                                :param t: Index of the newest task.
+                                :param train_ids: The indices of the nodes participating in the training in all the existing tasks.
+                                :param ids_per_cls_all: Indices of the nodes in each class of all the existing tasks.
+                                :param dataset: The entire dataset (not in use in the current baseline).
+
+                                """
         self.net.train()
         if t!=self.current_task:
             self.current_task = t

@@ -35,6 +35,14 @@ def kaiming_normal_init(m):
 		torch.nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
         
 class NET(torch.nn.Module):
+    """
+        LwF baseline for NCGL tasks
+
+        :param model: The backbone GNNs, e.g. GCN, GAT, GIN, etc.
+        :param task_manager: Mainly serves to store the indices of the output dimensions corresponding to each task
+        :param args: The arguments containing the configurations of the experiments including the training parameters like the learning rate, the setting confugurations like class-IL and task-IL, etc. These arguments are initialized in the train.py file and can be specified by the users upon running the code.
+
+        """
     def __init__(self,
                  model,
                  task_manager,
@@ -76,7 +84,21 @@ class NET(torch.nn.Module):
         return h
                 
     def observe(self, args, g, features, labels, t, prev_model, train_ids, ids_per_cls, dataset):
-        self.net.train()   
+        """
+                The method for learning the given tasks under the class-IL setting.
+
+                :param args: Same as the args in __init__().
+                :param g: The graph of the current task.
+                :param features: Node features of the current task.
+                :param labels: Labels of the nodes in the current task.
+                :param t: Index of the current task.
+                :param prev_model: The model obtained after learning the previous task.
+                :param train_ids: The indices of the nodes participating in the training.
+                :param ids_per_cls: Indices of the nodes in each class (not in use in the current baseline).
+                :param dataset: The entire dataset (not in use in the current baseline).
+
+                """
+        self.net.train()
         # if new task
         if t != self.current_task:            
             self.current_task = t        
@@ -114,6 +136,20 @@ class NET(torch.nn.Module):
         self.opt.step()
 
     def observe_task_IL(self, args, g, features, labels, t, prev_model, train_ids, ids_per_cls, dataset):
+        """
+                        The method for learning the given tasks under the task-IL setting.
+
+                        :param args: Same as the args in __init__().
+                        :param g: The graph of the current task.
+                        :param features: Node features of the current task.
+                        :param labels: Labels of the nodes in the current task.
+                        :param t: Index of the current task.
+                        :param prev_model: The model obtained after learning the previous task.
+                        :param train_ids: The indices of the nodes participating in the training.
+                        :param ids_per_cls: Indices of the nodes in each class (not in use in the current baseline).
+                        :param dataset: The entire dataset (not in use in the current baseline).
+
+                        """
         self.net.train()
         # if new task
         if t != self.current_task:
@@ -154,6 +190,21 @@ class NET(torch.nn.Module):
         self.opt.step()
 
     def observe_task_IL_batch(self, args, g, dataloader, features, labels, t, prev_model, train_ids, ids_per_cls, dataset):
+        """
+                        The method for learning the given tasks under the task-IL setting with mini-batch training.
+
+                        :param args: Same as the args in __init__().
+                        :param g: The graph of the current task.
+                        :param dataloader: The data loader for mini-batch training
+                        :param features: Node features of the current task.
+                        :param labels: Labels of the nodes in the current task.
+                        :param t: Index of the current task.
+                        :param prev_model: The model obtained after learning the previous task.
+                        :param train_ids: The indices of the nodes participating in the training.
+                        :param ids_per_cls: Indices of the nodes in each class (currently not in use).
+                        :param dataset: The entire dataset (currently not in use).
+
+                        """
         self.net.train()
         # if new task
         if t != self.current_task:
@@ -199,6 +250,21 @@ class NET(torch.nn.Module):
             self.opt.step()
 
     def observe_class_IL_batch(self, args, g, dataloader, features, labels, t, prev_model, train_ids, ids_per_cls, dataset):
+        """
+                                The method for learning the given tasks under the class-IL setting with mini-batch training.
+
+                                :param args: Same as the args in __init__().
+                                :param g: The graph of the current task.
+                                :param dataloader: The data loader for mini-batch training
+                                :param features: Node features of the current task.
+                                :param labels: Labels of the nodes in the current task.
+                                :param t: Index of the current task.
+                                :param prev_model: The model obtained after learning the previous task.
+                                :param train_ids: The indices of the nodes participating in the training.
+                                :param ids_per_cls: Indices of the nodes in each class (currently not in use).
+                                :param dataset: The entire dataset (currently not in use).
+
+                                """
         self.net.train()
         # if new task
         if t != self.current_task:

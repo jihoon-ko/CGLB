@@ -13,6 +13,13 @@ def predict(args, model, bg, task_id):
 
 
 class NET(torch.nn.Module):
+    """
+        Bare model baseline for GCGL tasks
+
+        :param model: The backbone GNNs, e.g. GCN, GAT, GIN, etc.
+        :param args: The arguments containing the configurations of the experiments including the training parameters like the learning rate, the setting confugurations like class-IL and task-IL, etc. These arguments are initialized in the train.py file and can be specified by the users upon running the code.
+
+        """
     def __init__(self,
                  model,
                  args):
@@ -28,7 +35,15 @@ class NET(torch.nn.Module):
         return output
 
     def observe(self, data_loader, loss_criterion, task_i, args):
+        """
+                The method for learning the given tasks under the task-IL setting with multi-label classification datasets.
 
+                :param data_loader: The data loader for mini-batch training.
+                :param loss_criterion: The loss function.
+                :param task_i: Index of the current task.
+                :param args: Same as the args in __init__().
+
+                """
         self.net.train()
         train_meter = Meter()
         for batch_id, batch_data in enumerate(data_loader):
@@ -48,6 +63,15 @@ class NET(torch.nn.Module):
         train_score = np.mean(train_meter.compute_metric(args['metric_name']))
 
     def observe_tskIL_multicls(self, data_loader, loss_criterion, task_i, args):
+        """
+                        The method for learning the given tasks under the task-IL setting with multi-class classification datasets.
+
+                        :param data_loader: The data loader for mini-batch training.
+                        :param loss_criterion: The loss function.
+                        :param task_i: Index of the current task.
+                        :param args: Same as the args in __init__().
+
+                        """
         # not real cls-IL, just task Il under multi-class setting
         self.net.train()
         #train_meter = Meter()
@@ -72,6 +96,15 @@ class NET(torch.nn.Module):
             #train_meter.update(logits, labels, masks)
 
     def observe_clsIL(self, data_loader, loss_criterion, task_i, args):
+        """
+                                The method for learning the given tasks under the class-IL setting with multi-class classification datasets.
+
+                                :param data_loader: The data loader for mini-batch training.
+                                :param loss_criterion: The loss function.
+                                :param task_i: Index of the current task.
+                                :param args: Same as the args in __init__().
+
+                                """
         self.net.train()
         #train_meter = Meter()
         clss = []
