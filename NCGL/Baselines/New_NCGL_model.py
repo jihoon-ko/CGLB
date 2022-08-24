@@ -78,7 +78,7 @@ class NET(torch.nn.Module):
     def observe(self, args, g, features, labels, t, prev_model, train_ids, ids_per_cls, dataset):
         """
                 The method for learning the given tasks. Each time a new task is presented, this function will be called to learn the task. Therefore, how the model adapts to new tasks and prevent forgetting on old tasks are all implemented in this function.
-
+                More detailed comments accompanying the code can be found in the source code of this template in our GitHub repository.
 
                 :param args: Same as the args in __init__().
                 :param g: The graph of the current task.
@@ -133,3 +133,4 @@ class NET(torch.nn.Module):
         # Now the loss contains two parts, one optimizes the model to adapt to the new task, and the other serves to alleviate forgetting.
         loss.backward()
         self.opt.step()
+        # no output is required from this function, it only serves to trained the model, and the model is the desired output.

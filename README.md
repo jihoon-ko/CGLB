@@ -109,6 +109,22 @@ When running the code in Windows system, the following error **OSError: [Errno 2
         --replace_illegal_char True 
  ```
 
+### Modifying the train-validation-test Splitting
+
+The splitting can be simply specified via the arguments when running the experiments. In our implemented pipeline, the corresponding arguments are the validation and testing ratios. For example,
+
+```
+python train.py --dataset Arxiv-CL \
+        --method bare \
+        --backbone GCN \
+        --gpu 0 \
+        --ILmode taskIL \
+        --inter-task-edges False \
+        --minibatch False \
+        --ratio_valid_test 0.4 0.4
+```
+
+The example above set the data ratio for validation and testing as 0.4 and 0.4, and the training ratio is automatically calculated as 0.2.
 
 ### Implementing New Methods 
 
