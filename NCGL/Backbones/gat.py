@@ -158,25 +158,34 @@ class GAT(nn.Module):
     def forward(self, g, inputs, save_logit_name = None):
         h = inputs
         e_list = []
-        
         for l in range(self.num_layers):
             h, e = self.gat_layers[l](g, h)
             h = h.flatten(1)
             h = self.activation(h)
             e_list = e_list + e
-
         # store for ergnn
         self.second_last_h = h
-            
         # output projection
         logits, e = self.gat_layers[-1](g, h)
-
         #self.second_last_h = logits if len(self.gat_layers) == 1 else h
-
         logits = logits.mean(1)
         e_list = e_list + e
-        
         return logits, e_list
+
+    def forward_batch(self, blocks, features):
+        e_list = []
+        h = features
+        for i,layer in enumerate(self.gat_layers[:-1]):
+            h, e = layer.forward_batch(blocks[i], h)
+            h = h.flatten(1)
+            h = self.activation(h)
+            e_list = e_list + e
+        logits, e = self.gat_layers[-1].forward_batch(blocks[-1], h)
+        self.second_last_h = logits if len(self.gat_layers) == 1 else h
+        logits = logits.mean(1)
+        e_list = e_list + e
+        return logits, e_list
+
 
     def reset_params(self):
         for layer in self.gat_layers:

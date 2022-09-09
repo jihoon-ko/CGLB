@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--repeats', type=int, default=1, help='how many times to repeat the experiments for the mean and std')
     parser.add_argument('--ILmode', default='taskIL',choices=['taskIL','classIL'])
     parser.add_argument('--batch_size', type=int, default=2000)
-    parser.add_argument('--minibatch', type=strtobool, default=False, help='whether to use the mini-batch training')
+    parser.add_argument('--minibatch', type=strtobool, default=True, help='whether to use the mini-batch training')
     parser.add_argument('--batch_shuffle', type=strtobool, default=True, help='whether to shuffle the data when constructing the dataloader')
     parser.add_argument('--sample_nbs', type=strtobool, default=False, help='whether to sample neighbors instead of using all')
     parser.add_argument('--n_nbs_sample', type=lambda x: [int(i) for i in x.replace(' ', '').split(',')], default=[10, 25], help='number of neighbors to sample per hop, use comma to separate the numbers when using the command line, e.g. 10,25 or 10, 25')

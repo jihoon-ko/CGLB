@@ -390,28 +390,52 @@ class GATConv(nn.Module):
         """
         elist = []
         graph = graph.local_var().to('cuda:{}'.format(feat.get_device()))
-        
         h = self.feat_drop(feat)
-        #print('type of h is {}'.format(h.dtype))
-        feat = self.fc(h).view(-1, self._num_heads, self._out_feats)  
-        
+        feat = self.fc(h).view(-1, self._num_heads, self._out_feats)
         el = (feat * self.attn_l1).sum(dim=-1).unsqueeze(-1) 
         er = (feat * self.attn_r1).sum(dim=-1).unsqueeze(-1) 
         graph.ndata.update({'ft': feat, 'el': el, 'er': er}) 
         graph.apply_edges(fn.u_add_v('el', 'er', 'e'))      
         e = self.leaky_relu(graph.edata.pop('e'))  
-        e_soft = edge_softmax(graph, e)   
-    
+        e_soft = edge_softmax(graph, e)
         elist.append(e_soft)
         graph.edata['a'] = self.attn_drop(e_soft)       
         graph.update_all(fn.u_mul_e('ft', 'a', 'm'), fn.sum('m', 'ft')) 
         rst = graph.ndata['ft'] 
         if self.activation:
             rst = self.activation(rst)
-                  
         # residual
         if self.res_fc is not None:
             resval = self.res_fc(h).view(h.shape[0], -1, self._out_feats)
             rst = rst + resval
-    
+        return rst, elist
+
+    def forward_batch(self, block, feat):
+        # Creating a local scope so that all the stored ndata and edata
+        # (such as the `'h'` ndata below) are automatically popped out
+        # when the scope exits.
+        elist = []
+        block = block.local_var().to('cuda:{}'.format(feat.get_device()))
+        h_src = h_dst = self.feat_drop(feat)
+        feat_src = self.fc(h_src).view(
+            -1, self._num_heads, self._out_feats)
+        feat_dst = feat_src[:block.number_of_dst_nodes()] # the first few nodes are dst nodes, as explained in https://docs.dgl.ai/tutorials/large/L1_large_node_classification.html
+        el = (feat_src * self.attn_l1).sum(dim=-1).unsqueeze(-1)
+        er = (feat_dst * self.attn_r1).sum(dim=-1).unsqueeze(-1)
+        #block.srcdata.update({'ft': feat, 'el': el, 'er': er})
+        block.srcdata.update({'ft': feat_src, 'el': el})
+        block.dstdata.update({'er': er})
+        block.apply_edges(fn.u_add_v('el', 'er', 'e'))
+        e = self.leaky_relu(block.edata.pop('e'))
+        e_soft = edge_softmax(block, e)
+        elist.append(e_soft)
+        block.edata['a'] = self.attn_drop(e_soft)
+        block.update_all(fn.u_mul_e('ft', 'a', 'm'), fn.sum('m', 'ft'))
+        rst = block.dstdata['ft']
+        if self.activation:
+            rst = self.activation(rst)
+        # residual
+        if self.res_fc is not None:
+            resval = self.res_fc(h_dst).view(h_dst.shape[0], -1, self._out_feats)
+            rst = rst + resval
         return rst, elist

@@ -172,7 +172,14 @@ The newly implemented method should be contained in a python script file under t
  
  ## Benchmarks
  This section shows our currently obtained results from different baselines. This section will keeps being updated to show state-of-the-art results.
- ### N-CGL under Task-IL
+### Dataset Statistics
+The statistics of the NCGL datasets are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/NCGL_dataset_statistics.png)
+
+The statistics of the GCGL datasets are shown below.
+![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/GCGL_dataset_statistics.png)
+
+### N-CGL under Task-IL
  The results on N-CGL under the task-IL setting without inter-task edges are shown below.
 ![CGLB](https://github.com/QueuQ/CGLB/blob/master/figures/ncgl_taskIL_no_crsedge.png)
  The results on N-CGL under the task-IL setting with inter-task edges are shown below.
